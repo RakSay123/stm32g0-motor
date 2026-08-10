@@ -8,5 +8,11 @@
 #pragma once
 
 #include "led/led.h"
+#include "tb6612fng/tb6612fng.h"
+#include "dc_motor/dc_motor.h"
 
 LED_t* board_get_status_led(void);
+
+TB6612FNG_t* board_get_tb6612fng(void);
+
+DC_MOTOR_t* board_get_motor(void);

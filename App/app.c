@@ -11,12 +11,18 @@
 #include "device_instances.h"
 
 #include "systick/systick.h"
+#include "uart/uart.h"
+
 #include "led/led.h"
+#include "tb6612fng/tb6612fng.h"
+#include "dc_motor/dc_motor.h"
 
 static uint32_t previous_toggle_ms;
 
 void app_init(void)
 {
+	uart_write_line(USART2, "SUCCESSFUL BOOT");
+
 	previous_toggle_ms = millis();
 }
 
