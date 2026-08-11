@@ -24,7 +24,7 @@
 #include "tb6612fng/tb6612fng.h"
 #include "dc_motor/dc_motor.h"
 
-GPIO_Config_t usart2_tx = {
+static GPIO_Config_t usart2_tx = {
 	.port = GPIOA,
 	.pin = 2,
 	.mode = GPIO_MODE_AF,
@@ -34,7 +34,7 @@ GPIO_Config_t usart2_tx = {
 	.alternate = GPIO_AF1
 };
 
-GPIO_Config_t usart2_rx = {
+static GPIO_Config_t usart2_rx = {
 	.port = GPIOA,
 	.pin = 3,
 	.mode = GPIO_MODE_AF,
@@ -44,17 +44,33 @@ GPIO_Config_t usart2_rx = {
 	.alternate = GPIO_AF1
 };
 
-UART_Config_t usart2_cfg = {
+static UART_Config_t usart2_cfg = {
 	.USARTx = USART2,
 	.fclk = BOARD_FCLK_HZ,
 	.baud_rate = BOARD_DEBUG_UART_BAUD,
 };
 
-TIM_Config_t tim3_cfg = {
+static TIM_Config_t tim3_cfg = {
 	.TIMx = TIM3,
 	.psc = BOARD_TIM3_PSC,
 	.arr = BOARD_TIM3_ARR,
 	.cnt = BOARD_TIM3_CNT,
+	.interrupt_status = TIM_INTERRUPTS_DISABLED
+};
+
+static TIM_Config_t tim16_cfg = {
+	.TIMx = TIM16,
+	.psc = BOARD_TIM16_PSC,
+	.arr = BOARD_TIM16_ARR,
+	.cnt = BOARD_TIM16_CNT,
+	.interrupt_status = TIM_INTERRUPTS_DISABLED
+};
+
+static TIM_Config_t tim17_cfg = {
+	.TIMx = TIM17,
+	.psc = BOARD_TIM17_PSC,
+	.arr = BOARD_TIM17_ARR,
+	.cnt = BOARD_TIM17_CNT,
 	.interrupt_status = TIM_INTERRUPTS_DISABLED
 };
 
@@ -72,6 +88,8 @@ BOARD_Status_t board_init(void)
 	gpio_init(&usart2_rx);
 	systick_init(BOARD_FCLK_HZ / BOARD_SYSTICK_HZ);
 	if (timer_init(&tim3_cfg) != TIM_OK) return BOARD_STATUS_TIM3_ERROR;
+	if (timer_init(&tim16_cfg) != TIM_OK) return BOARD_STATUS_TIM16_ERROR;
+	if (timer_init(&tim17_cfg) != TIM_OK) return BOARD_STATUS_TIM17_ERROR;
 	uart_init(&usart2_cfg);
 
 	led_init(status_led); // void return type at the moment

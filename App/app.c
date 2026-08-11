@@ -17,13 +17,23 @@
 #include "tb6612fng/tb6612fng.h"
 #include "dc_motor/dc_motor.h"
 
+//TB6612FNG_t *tb6612fng = board_get_tb6612fng();
+
+TB6612FNG_Direction_t direction;
+
 static uint32_t previous_toggle_ms;
+static uint32_t previous_motor_switch_ms;
 
 void app_init(void)
 {
+	tb6612fng_set_duty_cycle(board_get_tb6612fng(), TB6612FNG_CHA, 100);
+	tb6612fng_set_duty_cycle(board_get_tb6612fng(), TB6612FNG_CHB, 100);
 	uart_write_line(USART2, "SUCCESSFUL BOOT");
 
+	direction = TB6612FNG_DIRECTION_CW;
+
 	previous_toggle_ms = millis();
+	previous_motor_switch_ms = millis();
 }
 
 void app_update(void)
@@ -34,5 +44,21 @@ void app_update(void)
 	{
 		previous_toggle_ms = current_ms;
 		led_toggle(board_get_status_led());
+	}
+
+	if (current_ms - previous_motor_switch_ms >= APP_MOTOR_DIR_SWITCH_INTERVAL_MS)
+	{
+		previous_motor_switch_ms = current_ms;
+
+		if (direction == TB6612FNG_DIRECTION_CW)
+		{
+			tb6612fng_set_direction(board_get_tb6612fng(), TB6612FNG_CHA, direction);
+			direction = TB6612FNG_DIRECTION_CCW;
+		}
+		else if (direction == TB6612FNG_DIRECTION_CCW)
+		{
+			tb6612fng_set_direction(board_get_tb6612fng(), TB6612FNG_CHA, direction);
+			direction = TB6612FNG_DIRECTION_CW;
+		}
 	}
 }

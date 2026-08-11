@@ -97,45 +97,45 @@ void gpio_init(GPIO_Config_t *cfg)
 	}
 }
 
-void gpio_write(GPIO_TypeDef *GPIOx, uint8_t pin, GPIO_State_t state)
+void gpio_write(GPIO_Pin_t *gpio, GPIO_State_t state)
 {
 	if (state == GPIO_HIGH)
 	{
-		GPIOx->BSRR |= (1U << pin);
+		gpio->port->BSRR |= (1U << gpio->pin);
 	}
 	else if (state == GPIO_LOW)
 	{
-		GPIOx->BSRR |= (1U << (pin + 16));
+		gpio->port->BSRR |= (1U << (gpio->pin + 16));
 	}
 }
 
-void gpio_toggle(GPIO_TypeDef *GPIOx, uint8_t pin)
+void gpio_toggle(GPIO_Pin_t *gpio)
 {
-	if (GPIOx->ODR & (1U << pin))
+	if (gpio->port->ODR & (1U << gpio->pin))
 	{
-		GPIOx->BSRR |= (1U << (pin + 16));
+		gpio->port->BSRR |= (1U << (gpio->pin + 16));
 	}
 	else
 	{
-		GPIOx->BSRR |= (1U << pin);
+		gpio->port->BSRR |= (1U << gpio->pin);
 	}
 }
 
-void gpio_toggle_pin(GPIO_Config_t *GPIO)
+void gpio_toggle_pin(GPIO_Config_t *cfg)
 {
-	if (GPIO->port->ODR & (1U << GPIO->pin))
+	if (cfg->port->ODR & (1U << cfg->pin))
 	{
-		GPIO->port->BSRR |= (1U << (GPIO->pin + 16));
+		cfg->port->BSRR |= (1U << (cfg->pin + 16));
 	}
 	else
 	{
-		GPIO->port->BSRR |= (1U << GPIO->pin);
+		cfg->port->BSRR |= (1U << cfg->pin);
 	}
 }
 
-GPIO_State_t gpio_read(GPIO_TypeDef *GPIOx, uint8_t pin)
+GPIO_State_t gpio_read(GPIO_Pin_t *gpio)
 {
-	if (GPIOx->IDR & (1U << pin))
+	if (gpio->port->IDR & (1U << gpio->pin))
 	{
 		return GPIO_HIGH;
 	}
@@ -143,4 +143,14 @@ GPIO_State_t gpio_read(GPIO_TypeDef *GPIOx, uint8_t pin)
 	{
 		return GPIO_LOW;
 	}
+}
+
+GPIO_State_t gpio_read_pin(GPIO_Config_t *cfg)
+{
+	GPIO_Pin_t gpio = {
+		.port = cfg->port,
+		.pin = cfg->pin
+	};
+
+	return gpio_read(&gpio);
 }

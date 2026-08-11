@@ -79,6 +79,11 @@ typedef struct {
 	GPIO_AF_t alternate;
 } GPIO_Config_t;
 
+typedef struct {
+	GPIO_TypeDef *port;
+	uint8_t pin;
+} GPIO_Pin_t;
+
 /**
  * @brief Turns on appropriate clock signal depending on which GPIO port is intended to be used
  *
@@ -192,7 +197,7 @@ void gpio_init(GPIO_Config_t *cfg);
  *
  * @return None
  */
-void gpio_write(GPIO_TypeDef *GPIOx, uint8_t pin, GPIO_State_t state);
+void gpio_write(GPIO_Pin_t *gpio, GPIO_State_t state);
 
 /**
  * @brief Switches pin output from HIGH to LOW or LOW to HIGH from a specific pin
@@ -205,7 +210,7 @@ void gpio_write(GPIO_TypeDef *GPIOx, uint8_t pin, GPIO_State_t state);
  *
  * @return None
  */
-void gpio_toggle(GPIO_TypeDef *GPIOx, uint8_t pin);
+void gpio_toggle(GPIO_Pin_t *gpio);
 
 /**
  * @brief Switches pin output from HIGH to LOW or LOW to HIGH from a specific pin (config)
@@ -217,7 +222,7 @@ void gpio_toggle(GPIO_TypeDef *GPIOx, uint8_t pin);
  *
  * @return None
  */
-void gpio_toggle_pin(GPIO_Config_t *GPIO);
+void gpio_toggle_pin(GPIO_Config_t *gpio);
 
 /**
  * @brief Reads input from a specific pin using the IDR register
@@ -229,6 +234,8 @@ void gpio_toggle_pin(GPIO_Config_t *GPIO);
  *
  * @note Reads actual pin state, which may differ from ODR due to external circuitry.
  */
-GPIO_State_t gpio_read(GPIO_TypeDef *GPIOx, uint8_t pin);
+GPIO_State_t gpio_read(GPIO_Pin_t *gpio);
+
+GPIO_State_t gpio_read_pin(GPIO_Config_t *cfg);
 
 #endif /* GPIO_H_ */
