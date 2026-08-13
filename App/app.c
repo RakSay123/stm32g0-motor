@@ -26,7 +26,7 @@ static uint32_t previous_motor_switch_ms;
 
 void app_init(void)
 {
-	tb6612fng_set_duty_cycle(board_get_tb6612fng(), TB6612FNG_CHA, 100);
+	dc_motor_set_speed_and_direction(board_get_motor(), TB6612FNG_DIRECTION_CW, 0);
 	tb6612fng_set_duty_cycle(board_get_tb6612fng(), TB6612FNG_CHB, 100);
 	uart_write_line(USART2, "SUCCESSFUL BOOT");
 
@@ -52,13 +52,13 @@ void app_update(void)
 
 		if (direction == TB6612FNG_DIRECTION_CW)
 		{
-			tb6612fng_set_direction(board_get_tb6612fng(), TB6612FNG_CHA, direction);
 			direction = TB6612FNG_DIRECTION_CCW;
+			dc_motor_set_speed_and_direction(board_get_motor(), direction, 100);
 		}
 		else if (direction == TB6612FNG_DIRECTION_CCW)
 		{
-			tb6612fng_set_direction(board_get_tb6612fng(), TB6612FNG_CHA, direction);
 			direction = TB6612FNG_DIRECTION_CW;
+			dc_motor_set_speed_and_direction(board_get_motor(), direction, 100);
 		}
 	}
 }

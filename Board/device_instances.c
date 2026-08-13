@@ -13,56 +13,56 @@ static LED_t status_led = {
 	.mode = LED_MODE_GPIO,
 };
 
-GPIO_Pin_t ain1_pin = {
-	.port = GPIOA,
-	.pin = 6
-};
-
-GPIO_Pin_t ain2_pin = {
-	.port = GPIOA,
+static GPIO_Pin_t ain1_pin = {
+	.port = GPIOC,
 	.pin = 7
 };
 
-GPIO_Pin_t pwma_pin = {
+static GPIO_Pin_t ain2_pin = {
+	.port = GPIOA,
+	.pin = 9
+};
+
+static GPIO_Pin_t pwma_pin = {
 	.port = GPIOD,
 	.pin = 0
 };
 
-TIM_PWM_Config_t pwma_cfg = {
+static TIM_PWM_Config_t pwma_cfg = {
 	.TIMx = TIM16,
 	.channel = 1,
 	.duty_cycle = 0,
 	.pwm_mode = TIM_PWM1
 };
 
-GPIO_Pin_t bin1_pin = {
+static GPIO_Pin_t bin1_pin = {
 	.port = GPIOA,
 	.pin = 10
 };
 
-GPIO_Pin_t bin2_pin = {
+static GPIO_Pin_t bin2_pin = {
 	.port = GPIOB,
 	.pin = 3
 };
 
-GPIO_Pin_t pwmb_pin = {
+static GPIO_Pin_t pwmb_pin = {
 	.port = GPIOD,
 	.pin = 1
 };
 
-TIM_PWM_Config_t pwmb_cfg = {
+static TIM_PWM_Config_t pwmb_cfg = {
 	.TIMx = TIM17,
 	.channel = 1,
 	.duty_cycle = 0,
 	.pwm_mode = TIM_PWM1
 };
 
-GPIO_Pin_t tb6612fng_stby_pin = {
+static GPIO_Pin_t tb6612fng_stby_pin = {
 	.port = GPIOA,
 	.pin = 8
 };
 
-TB6612FNG_Channel_Config_t tb6612fng_cha = {
+static TB6612FNG_Channel_Config_t tb6612fng_cha = {
 	.in1 = &ain1_pin,
 	.in2 = &ain2_pin,
 
@@ -71,7 +71,7 @@ TB6612FNG_Channel_Config_t tb6612fng_cha = {
 	.pwm = &pwma_cfg
 };
 
-TB6612FNG_Channel_Config_t tb6612fng_chb = {
+static TB6612FNG_Channel_Config_t tb6612fng_chb = {
 	.in1 = &bin1_pin,
 	.in2 = &bin2_pin,
 
@@ -86,8 +86,70 @@ static TB6612FNG_t tb6612fng = {
 	.channel_b = &tb6612fng_chb
 };
 
-static DC_MOTOR_t motor = {
+static TIM_ENCODER_Config_t tim3_encoder_cfg = {
+	.TIMx = TIM3,
 
+	.channel_a_port = GPIOA,
+	.channel_a_pin = 6,
+	.channel_a_AF = GPIO_AF1,
+
+	.channel_b_port = GPIOA,
+	.channel_b_pin = 7,
+	.channel_b_AF = GPIO_AF1,
+
+	.mode = TIM_ENCODER_MODE_TI1_TI2_EDGES,
+
+	.channel_a_filter = TIM_ENCODER_FILTER_NONE,
+	.channel_b_filter = TIM_ENCODER_FILTER_NONE,
+
+	.channel_a_psc = TIM_ENCODER_IC_PSC_NONE,
+	.channel_b_psc = TIM_ENCODER_IC_PSC_NONE,
+
+	.channel_a_polarity = TIM_ENCODER_POLARITY_NORMAL,
+	.channel_b_polarity = TIM_ENCODER_POLARITY_NORMAL
+};
+
+static ROTARY_ENCODER_t rotary_encoder_cfg = {
+	.encoder_cfg = &tim3_encoder_cfg,
+
+	.radius_mm = 1.0f,
+
+	.pulses_per_revolution = 210U,
+	.counts_per_revolution = 420U,
+
+	.raw_count = 0U,
+	.previous_raw_count = 0U,
+	.delta_count = 0U,
+	.total_count = 0U,
+
+	.revolutions = 0U,
+	.cumulative_angle_degrees = 0U,
+	.normalized_angle_degrees = 0U,
+
+	.displacement_mm = 0U,
+	.total_distance_mm = 0U,
+
+	.previous_update_ms = 0U,
+	.sample_period_ms = 0U,
+
+	.revolutions_per_second = 0U,
+	.rpm = 0U,
+	.degrees_per_second = 0U,
+	.radians_per_second = 0U,
+	.linear_velocity_mm_per_second = 0U,
+
+	.direction = TIM_ENCODER_DIRECTION_UP,
+	.motion = ROTARY_ENCODER_STOPPED,
+
+	.consecutive_zero_samples = 0U,
+	.stopped_sample_threshold = 5U,
+};
+
+DC_MOTOR_t motor = {
+	.motor_driver = &tb6612fng,
+	.encoder = &rotary_encoder_cfg,
+
+	.driver_channel = TB6612FNG_CHA
 };
 
 LED_t* board_get_status_led(void)
