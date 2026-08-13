@@ -147,7 +147,7 @@ TB6612FNG_Status_t tb6612fng_set_duty_cycle(TB6612FNG_t *tb6612fng, TB6612FNG_Ch
 	TB6612FNG_Channel_Config_t *ch = tb6612fng_get_channel(tb6612fng, channel);
 	if (ch == NULL) return TB6612FNG_ERR;
 
-	if (timer_pwm_set_duty_cycle(ch->pwm, duty_cycle) != TIM_OK) return TB6612FNG_ERR;
+	if (timer_pwm_set_compare_value(ch->pwm, duty_cycle) != TIM_OK) return TB6612FNG_ERR;
 
 	return TB6612FNG_OK;
 }

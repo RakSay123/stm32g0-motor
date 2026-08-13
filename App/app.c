@@ -137,7 +137,7 @@ void app_init(void)
 	rotary_encoder_update_success = rotary_encoder_set_count_zero(rotary_encoder) == ROTARY_ENCODER_OK;
 
 	dc_motor_set_speed_and_direction(dc_motor, TB6612FNG_DIRECTION_CW, 0);
-	tb6612fng_set_duty_cycle(dc_motor->motor_driver, TB6612FNG_CHB, 100);
+	tb6612fng_set_duty_cycle(dc_motor->motor_driver, TB6612FNG_CHB, APP_MOTOR_FULL_SPEED);
 
 	uart_write_line(USART2, "SUCCESSFUL BOOT");
 	systick_delay_s(2);
@@ -184,12 +184,12 @@ void app_update(void)
 		if (direction == TB6612FNG_DIRECTION_CW)
 		{
 			direction = TB6612FNG_DIRECTION_CCW;
-			dc_motor_set_speed_and_direction(dc_motor, direction, 100);
+			dc_motor_set_speed_and_direction(dc_motor, direction, APP_MOTOR_FULL_SPEED);
 		}
 		else if (direction == TB6612FNG_DIRECTION_CCW)
 		{
 			direction = TB6612FNG_DIRECTION_CW;
-			dc_motor_set_speed_and_direction(dc_motor, direction, 100);
+			dc_motor_set_speed_and_direction(dc_motor, direction, APP_MOTOR_FULL_SPEED);
 		}
 	}
 }

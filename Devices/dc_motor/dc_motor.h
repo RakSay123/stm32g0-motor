@@ -20,11 +20,11 @@ typedef struct {
 
 DC_MOTOR_Status_t dc_motor_init(DC_MOTOR_t *motor);
 
-DC_MOTOR_Status_t dc_motor_set_speed(DC_MOTOR_t *motor, uint8_t speed);
+DC_MOTOR_Status_t dc_motor_set_speed(DC_MOTOR_t *motor, uint16_t speed);
 
 DC_MOTOR_Status_t dc_motor_set_direction(DC_MOTOR_t *motor, TB6612FNG_Direction_t direction);
 
-DC_MOTOR_Status_t dc_motor_set_speed_and_direction(DC_MOTOR_t *motor, TB6612FNG_Direction_t direction, uint8_t speed);
+DC_MOTOR_Status_t dc_motor_set_speed_and_direction(DC_MOTOR_t *motor, TB6612FNG_Direction_t direction, uint16_t speed);
 
 DC_MOTOR_Status_t dc_motor_brake(DC_MOTOR_t *motor);
 
