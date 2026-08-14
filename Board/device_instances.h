@@ -13,6 +13,8 @@
 
 LED_t* board_get_status_led(void);
 
+ROTARY_ENCODER_t* board_get_rotary_encoder(void);
+
 TB6612FNG_t* board_get_tb6612fng(void);
 
 DC_MOTOR_t* board_get_motor(void);

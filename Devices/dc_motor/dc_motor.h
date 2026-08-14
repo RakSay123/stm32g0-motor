@@ -11,8 +11,6 @@ typedef enum {
 
 typedef struct {
 	TB6612FNG_t *motor_driver;
-	ROTARY_ENCODER_t *encoder;
-
 	TB6612FNG_Channel_t driver_channel;
 } DC_MOTOR_t;
 
