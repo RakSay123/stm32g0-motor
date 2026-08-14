@@ -77,6 +77,7 @@ static TIM_Config_t tim17_cfg = {
 BOARD_Status_t board_init(void)
 {
 	LED_t *status_led = board_get_status_led();
+	ROTARY_ENCODER_t *encoder = board_get_rotary_encoder();
 	TB6612FNG_t *tb6612fng = board_get_tb6612fng();
 	DC_MOTOR_t *motor = board_get_motor();
 
@@ -93,6 +94,7 @@ BOARD_Status_t board_init(void)
 	uart_init(&usart2_cfg);
 
 	led_init(status_led); // void return type at the moment
+	if (rotary_encoder_init(encoder) != ROTARY_ENCODER_OK) return BOARD_STATUS_ROTARY_ENCODER_ERROR;
 	if (tb6612fng_init(tb6612fng) != TB6612FNG_OK) return BOARD_STATUS_TB6612FNG_ERROR;
 	if (dc_motor_init(motor) != DC_MOTOR_OK) return BOARD_STATUS_DC_MOTOR_ERROR;
 

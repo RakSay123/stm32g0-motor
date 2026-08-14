@@ -101,8 +101,6 @@ static void app_print_encoder_all(USART_TypeDef *USARTx, ROTARY_ENCODER_t *rotar
 	app_print_encoder_position(USARTx, rotary_encoder);
 	app_print_encoder_distance(USARTx, rotary_encoder);
 	app_print_encoder_velocity(USARTx, rotary_encoder);
-	uart_write_str(USARTx, "[DEBUG] TIM3->CNT: ");
-	uart_write_int(USARTx, (uint32_t)TIM3->CNT);
 	uart_write_line(USARTx, "");
 }
 
