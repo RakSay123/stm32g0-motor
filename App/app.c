@@ -20,15 +20,25 @@
 #include "tb6612fng/tb6612fng.h"
 #include "dc_motor/dc_motor.h"
 
+typedef enum {
+	APP_DEMO_LOW_SPEED_CW,
+	APP_DEMO_FULL_SPEED_CW,
+	APP_DEMO_COAST,
+	APP_DEMO_LOW_SPEED_CCW,
+	APP_DEMO_FULL_SPEED_CCW,
+	APP_DEMO_BRAKE,
+	APP_DEMO_COMPLETE
+} APP_Demo_State_t;
+
 static DC_MOTOR_t *dc_motor;
 static ROTARY_ENCODER_t *rotary_encoder;
 
-static TB6612FNG_Direction_t motor_direction;
+static APP_Demo_State_t demo_state;
 
 static uint32_t previous_led_toggle_ms;
 static uint32_t previous_encoder_update_ms;
 static uint32_t previous_encoder_print_ms;
-static uint32_t previous_motor_switch_ms;
+static uint32_t previous_demo_state_ms;
 
 static bool rotary_encoder_update_success;
 static uint8_t stop_snapshots_printed;
@@ -149,16 +159,59 @@ static void app_print_encoder(uint32_t current_ms)
 	app_print_encoder_all(USART2, rotary_encoder);
 }
 
-static void app_update_motor_demo(uint32_t current_ms)
+static void app_demo_enter_state(APP_Demo_State_t state, USART_TypeDef *USARTx)
 {
-	if (current_ms - previous_motor_switch_ms < APP_MOTOR_DEMO_SWITCH_MS) return;
+	switch (state)
+	{
+		case APP_DEMO_LOW_SPEED_CW:
+			uart_write_line(USARTx, "\r\n=== LOW SPEED CW ===");
+			dc_motor_set_speed_and_direction(dc_motor, TB6612FNG_DIRECTION_CW, APP_MOTOR_LOW_SPEED);
+			break;
 
-	previous_motor_switch_ms = current_ms;
+		case APP_DEMO_FULL_SPEED_CW:
+			uart_write_line(USARTx, "\r\n=== FULL SPEED CW ===");
+			dc_motor_set_speed_and_direction(dc_motor, TB6612FNG_DIRECTION_CW, APP_MOTOR_FULL_SPEED);
+			break;
 
-	if (motor_direction == TB6612FNG_DIRECTION_CW) motor_direction = TB6612FNG_DIRECTION_CCW;
-	else motor_direction = TB6612FNG_DIRECTION_CW;
+		case APP_DEMO_COAST:
+			uart_write_line(USARTx, "\r\n=== COAST ===");
+			dc_motor_coast(dc_motor);
+			break;
 
-	dc_motor_set_speed_and_direction(dc_motor, motor_direction, APP_MOTOR_FULL_SPEED);
+		case APP_DEMO_LOW_SPEED_CCW:
+			uart_write_line(USARTx, "\r\n=== LOW SPEED CCW ===");
+			dc_motor_set_speed_and_direction(dc_motor, TB6612FNG_DIRECTION_CCW, APP_MOTOR_LOW_SPEED);
+			break;
+
+		case APP_DEMO_FULL_SPEED_CCW:
+			uart_write_line(USARTx, "\r\n=== FULL SPEED CCW ===");
+			dc_motor_set_speed_and_direction(dc_motor, TB6612FNG_DIRECTION_CCW, APP_MOTOR_FULL_SPEED);
+			break;
+
+		case APP_DEMO_BRAKE:
+			uart_write_line(USARTx, "\r\n=== BRAKE ===");
+			dc_motor_brake(dc_motor);
+			break;
+
+		case APP_DEMO_COMPLETE:
+			uart_write_line(USARTx, "\r\n=== COMPLETE ===");
+			dc_motor_coast(dc_motor);
+			break;
+
+		default:
+			break;
+	}
+}
+
+static void app_update_demo(uint32_t current_ms)
+{
+	if (demo_state == APP_DEMO_COMPLETE) return;
+	if (current_ms - previous_demo_state_ms < APP_DEMO_STATE_DURATION_MS) return;
+
+	previous_demo_state_ms = current_ms;
+
+	demo_state++;
+	app_demo_enter_state(demo_state, USART2);
 }
 
 void app_init(void)
@@ -170,21 +223,19 @@ void app_init(void)
 	if (rotary_encoder == NULL) return;
 
 	rotary_encoder_update_success = rotary_encoder_set_count_zero(rotary_encoder) == ROTARY_ENCODER_OK;
-	motor_direction = TB6612FNG_DIRECTION_CW;
-
-	dc_motor_set_speed_and_direction(dc_motor, motor_direction, 0);
+	demo_state = APP_DEMO_LOW_SPEED_CW;
 
 	uint32_t current_ms = millis();
 
 	previous_led_toggle_ms = current_ms;
 	previous_encoder_update_ms = current_ms;
 	previous_encoder_print_ms = current_ms;
-	previous_motor_switch_ms = current_ms;
+	previous_demo_state_ms = current_ms;
 
 	stop_snapshots_printed = 0U;
 
 	uart_write_line(USART2, "SUCCESSFUL BOOT");
-	systick_delay_s(2);
+	app_demo_enter_state(demo_state, USART2);
 }
 
 void app_update(void)
@@ -194,5 +245,5 @@ void app_update(void)
 	app_update_status_led(current_ms);
 	app_update_encoder(current_ms);
 	app_print_encoder(current_ms);
-	app_update_motor_demo(current_ms);
+	app_update_demo(current_ms);
 }
