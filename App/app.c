@@ -203,6 +203,36 @@ static void app_demo_enter_state(APP_Demo_State_t state, USART_TypeDef *USARTx)
 	}
 }
 
+static APP_Demo_State_t app_demo_switch_state(APP_Demo_State_t state)
+{
+	switch (state)
+	{
+		case APP_DEMO_LOW_SPEED_CW:
+			return APP_DEMO_FULL_SPEED_CW;
+
+		case APP_DEMO_FULL_SPEED_CW:
+			return APP_DEMO_COAST;
+
+		case APP_DEMO_COAST:
+			return APP_DEMO_LOW_SPEED_CCW;
+
+		case APP_DEMO_LOW_SPEED_CCW:
+			return APP_DEMO_FULL_SPEED_CCW;
+
+		case APP_DEMO_FULL_SPEED_CCW:
+			return APP_DEMO_BRAKE;
+
+		case APP_DEMO_BRAKE:
+			return APP_DEMO_COMPLETE;
+
+		case APP_DEMO_COMPLETE:
+		default:
+			return APP_DEMO_COMPLETE;
+	}
+
+	return state;
+}
+
 static void app_update_demo(uint32_t current_ms)
 {
 	if (demo_state == APP_DEMO_COMPLETE) return;
@@ -210,7 +240,7 @@ static void app_update_demo(uint32_t current_ms)
 
 	previous_demo_state_ms = current_ms;
 
-	demo_state++;
+	demo_state = app_demo_switch_state(demo_state);
 	app_demo_enter_state(demo_state, USART2);
 }
 
